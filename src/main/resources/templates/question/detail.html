@@ -29,7 +29,7 @@
 
     <div class="d-flex justify-content-between">
         <a href="/questions/list" class="btn btn-outline-secondary">목록</a>
-        <div>
+        <div th:if="${isAuthor}">
             <a th:href="@{'/questions/edit/' + ${question.id}}" class="btn btn-outline-primary">수정</a>
             <form th:action="@{'/questions/delete/' + ${question.id}}" method="post"
                   onsubmit="return confirm('정말 삭제하시겠습니까?');"
@@ -39,11 +39,11 @@
         </div>
     </div>
 
-    <!-- 답변 영역 -->
+    <!-- 답변 영역 임시 비활성화
     <div th:replace="~{answer/list :: answerSection}"></div>
 
     <th:block th:replace="~{answer/list :: answerScript}"></th:block>
-
+-->
 </div>
 </body>
 </html>

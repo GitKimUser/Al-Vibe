@@ -1,13 +1,41 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
 <head>
     <meta charset="UTF-8">
     <title>질문 목록</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
+<div class="d-flex justify-content-end mb-2">
+    <span sec:authorize="isAuthenticated()" class="me-2 small text-muted">
+        <span sec:authentication="name"></span>님
+    </span>
+    <form sec:authorize="isAuthenticated()"
+          th:action="@{/logout}" method="post" class="d-inline">
+        <button type="submit" class="btn btn-sm btn-outline-secondary">로그아웃</button>
+    </form>
+    <a sec:authorize="!isAuthenticated()"
+       href="/member/login" class="btn btn-sm btn-outline-primary">로그인</a>
+</div>
 <body>
 <div class="container mt-4">
     <h2>알바 질문 게시판</h2>
+
+    <!-- 카테고리 선택 -->
+    <div class="mb-3 d-flex flex-wrap gap-2">
+        <a href="/questions/list"
+           class="btn btn-sm"
+           th:classappend="${currentCategoryId == null} ? 'btn-primary' : 'btn-outline-secondary'">
+            전체
+        </a>
+        <a th:each="cat : ${categories}"
+           th:href="@{/questions/list(categoryId=${cat.id})}"
+           th:text="${cat.name}"
+           class="btn btn-sm"
+           th:classappend="${currentCategoryId != null and currentCategoryId == cat.id} ? 'btn-primary' : 'btn-outline-secondary'">
+            카테고리
+        </a>
+    </div>
 
     <!--  검색창  -->
     <form th:action="@{/questions/list}" method="get"
