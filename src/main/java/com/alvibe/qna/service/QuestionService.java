@@ -7,8 +7,6 @@ import com.alvibe.qna.entity.Question;
 import com.alvibe.qna.repository.CategoryRepository;
 import com.alvibe.qna.repository.MemberRepository;
 import com.alvibe.qna.repository.QuestionRepository;
-import jakarta.servlet.http.HttpSession;
-import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -19,7 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @Service
-@RequiredArgsConstructor
 @Transactional
 public class QuestionService {
 
@@ -27,20 +24,20 @@ public class QuestionService {
     private final MemberRepository memberRepository;
     private final CategoryRepository categoryRepository;
 
-    // 1. 질문 목록 조회
-    public List<Question> getAllQuestion() {
-        return questionRepository.findByIsDeletedFalseOrderByCreatedAtDesc();
+    public QuestionService(QuestionRepository questionRepository, MemberRepository memberRepository,
+    CategoryRepository categoryRepository){
+        this.questionRepository = questionRepository;
+        this.memberRepository = memberRepository;
+        this.categoryRepository = categoryRepository;
     }
 
+    // 1. 질문 목록 조회 단순 list -> page로 변환 과 병합
+
+
     // 2. 질문 상세 조회
-    public Question getQuestionDetail(Long id, HttpSession session) {
+    public Question getQuestionDetail(Long id) {
         Question question = questionRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("질문을 찾을 수 없습니다. id=" + id));
-        String viewKey = "question_view_" + id;
-        if(session.getAttribute(viewKey) != null) {
-            questionRepository.increaseView(id);
-            session.setAttribute(viewKey, viewKey);
-        }
+                .orElseThrow(() -> new IllegalArgumentException("질문을 찾을 수 없습니다"));
         question.setViewCount(question.getViewCount() + 1);
         return question;
     }
@@ -126,7 +123,7 @@ public class QuestionService {
             default -> PageRequest.of(
                     page,
                     10,
-                    Sort.by(Sort.Direction.DESC, "CreatedAt")
+                    Sort.by(Sort.Direction.DESC, "createdAt")
             );
         };
 
